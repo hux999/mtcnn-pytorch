@@ -107,11 +107,12 @@ class CollateFn:
         batch_beta = torch.cat(beta_list)
         return batch_img,batch_label,batch_offset,batch_landmark,batch_beta
 
-def Train(train_data, net, num_epoch=1, lr=0.001, use_cuda=False):
+def Train(train_data, net, num_epoch=10, lr=0.001, use_cuda=False):
     if use_cuda:
         net.cuda()
-    net_ = torch.nn.DataParallel(net, device_ids=[0, 1, 2, 3, 4, 5])
-    #net_ = net
+        net_ = torch.nn.DataParallel(net, device_ids=[0, 1, 2, 3, 4, 5])
+    else:
+        net_ = net
     optimizer = torch.optim.Adam(net.parameters(), lr=lr)
     loss_fn = LossFn([1.0,0.5,0.5])
     for i_epoch in range(num_epoch):
@@ -153,5 +154,5 @@ if __name__ == '__main__':
     
     net = PNet(is_train=True)
 
-    Train(pnet_data, net, use_cuda=True) 
-
+    Train(pnet_data, net, 30, 0.001, use_cuda=True) 
+    Train(pnet_data, net, 30, 0.0001, use_cuda=True) 
